@@ -1,11 +1,12 @@
 require './ClampMaker.rb'
-require './CNCHelper.rb'
 
 puts "This program creates a toolpath for machining an outer profile, a hole, and a slot to create a clamp piece."
 
+puts "Use a slot drill (an end mill that can plunge in Z)."
+
 puts "Set X=0 and Y=0 on the workpiece such that the Cartesian quadrant within X>0 and Y>0 is solid workpiece material."
 
-puts "Use a slot drill (an end mill that can plunge in Z)."
+puts "When running the CNC program, start with the tool at X=0, Y=0, and Z=0."
 
 puts "What is the length of the clamp?"
 	 length = Float(gets)
