@@ -59,7 +59,7 @@ class ClampMaker
 
 					#feed/plunge down in Z by an increment of one axial depth of cut
 					puts "G91"
-					puts "G1Z-#{@axial_depth_of_cut.round(3)}F#{@z_feedrate}"
+					puts "G1Z-#{(@axial_depth_of_cut + @tool_radius).round(3)}F#{@z_feedrate}"
 					puts "G90"
 
 					#create an XY toolpath for machining the outside profile
@@ -106,16 +106,14 @@ class ClampMaker
 					#create the final pass to machine the final the diameter of the hole
 					puts "G3X#{(@large_profile_radius - 0.5*@hole_diameter + @tool_radius).round(3)}Y#{(@length - @large_profile_radius).round(3)}I#{(0.5*@hole_diameter - @tool_radius).round(3)}J0.0F#{@xy_feedrate}"
 
-					#return to the XY center of the hole to prepare for another axial depth of cut
-					puts "G0X#{@large_profile_radius.round(3)}Y#{@length.round(3) - @large_profile_radius.round(3)}"
-
 				end
 
 
 
 		def create_slot_toolpath
 
-			#puts "(TEST: create_slot_toolpath is starting)"
+			#rapid feed to the safe z height to prepare for XY motion
+			puts "G0Z#{@safe_z_height.round(3)}"
 			
 			#specify a variable to store the amount of material that is not yet machined
 			remaining_Z_stock = @material_thickness
@@ -139,7 +137,7 @@ class ClampMaker
 
 					#feed/plunge down in Z by an increment of one axial depth of cut
 					puts "G91"
-					puts "G1Z-#{@axial_depth_of_cut.round(3)}F#{@z_feedrate}"
+					puts "G1Z-#{(@axial_depth_of_cut + @tool_radius).round(3)}F#{@z_feedrate}"
 					puts "G90"
 
 					#create an XY toolpath for machining the outside profile
@@ -156,9 +154,6 @@ class ClampMaker
 
 				def create_XY_slot_profile_toolpath
 
-					#puts "(TEST: create_XY_slot_profile_toolpath is starting)"
-					#tool position is at the end of the slot near the hole
-
 					#feed to the Y position at the end of the slot opposite the hole
 					puts "G1Y#{@slot_to_end_of_clamp_distance.round(3)}F#{@xy_feedrate}"
 
@@ -170,8 +165,6 @@ class ClampMaker
 
 					#rough out the inner slot profile until there is less than one tool radius of stock remaining on both opposing sides
 					while (remaining_XY_slot_stock/2) > @tool_radius
-
-						#puts "(TEST: The loop within create_XY_slot_profile_toolpath is starting)"
 
 						#feed in the +X direction by one tool radius to prepare for an inner profile climb milling cut
 						puts "G1X#{(@half_width + i*@tool_radius).round(3)}F#{@xy_feedrate}F#{@xy_feedrate}"
