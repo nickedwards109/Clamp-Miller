@@ -52,7 +52,7 @@ class ClampMaker
 					puts "G90"
 
 					#rapid feed to the XY location of the hole
-					puts "G0X#{@large_profile_radius.round(3)}Y#{@length.round(3) - @large_profile_radius.round(3)}"
+					puts "G0X#{@large_profile_radius.round(3)}Y#{(@length - @large_profile_radius).round(3)}"
 
 					#rapid feed/plunge to one tool radius above the machined material
 					puts "G0Z#{(@tool_radius - (i - 1)*@axial_depth_of_cut).round(3)}"
