@@ -1,4 +1,5 @@
 require './ClampMaker.rb'
+require 'pry'
 
 puts "This program creates a toolpath for machining an outer profile, a hole, and a slot to create a clamp piece."
 

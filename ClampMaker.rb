@@ -36,12 +36,9 @@ class ClampMaker
 
 
 		def create_hole_toolpath
-			
+
 			#specify a variable to store the amount of material that is not yet machined
 			remaining_Z_stock = @material_thickness
-
-			#define a counting variable
-			i = 1
 
 				#create multiple successive profile passes while incrementing the axial depth of cut
 				while (remaining_Z_stock + @tool_radius) > 0
@@ -55,10 +52,9 @@ class ClampMaker
 					puts "G0X#{@large_profile_radius.round(3)}Y#{(@length - @large_profile_radius).round(3)}"
 
 					#rapid feed/plunge to one tool radius above the machined material
-					puts "G0Z#{(@tool_radius - (i - 1)*@axial_depth_of_cut).round(3)}"
-
-					#feed/plunge down in Z by an increment of one axial depth of cut
+					#feed/plunge into the material in Z by an increment of one axial depth of cut
 					puts "G91"
+					puts "G0Z-#{(@safe_z_height - @tool_radius).round(3)}"
 					puts "G1Z-#{(@axial_depth_of_cut + @tool_radius).round(3)}F#{@z_feedrate}"
 					puts "G90"
 
@@ -68,9 +64,10 @@ class ClampMaker
 					#there is now one axial depth of cut less of material
 					remaining_Z_stock = remaining_Z_stock - @axial_depth_of_cut
 
-					i = i + 1
-
 				end
+
+					#The hole is now complete. Rapid feed to Z zero to prepare for the next machining operation.
+					puts "G0Z0.0"
 
 		end
 
@@ -111,15 +108,9 @@ class ClampMaker
 
 
 		def create_slot_toolpath
-
-			#rapid feed to the safe z height to prepare for XY motion
-			puts "G0Z#{@safe_z_height.round(3)}"
 			
 			#specify a variable to store the amount of material that is not yet machined
 			remaining_Z_stock = @material_thickness
-
-			#define a counting variable
-			i = 1
 
 				#create multiple successive profile passes while incrementing the axial depth of cut
 				while (remaining_Z_stock + @tool_radius) > 0
@@ -133,10 +124,9 @@ class ClampMaker
 					puts "G0X#{@half_width.round(3)}Y#{(@length - @large_profile_radius - @slot_to_hole_distance).round(3)}"
 
 					#rapid feed/plunge to one tool radius above the machined material
-					puts "G0Z#{(@tool_radius - (i - 1)*@axial_depth_of_cut).round(3)}"
-
-					#feed/plunge down in Z by an increment of one axial depth of cut
+					#feed/plunge into the material in Z by an increment of one axial depth of cut
 					puts "G91"
+					puts "G0Z-#{(@safe_z_height - @tool_radius).round(3)}"
 					puts "G1Z-#{(@axial_depth_of_cut + @tool_radius).round(3)}F#{@z_feedrate}"
 					puts "G90"
 
@@ -145,9 +135,10 @@ class ClampMaker
 
 					remaining_Z_stock = remaining_Z_stock - @axial_depth_of_cut
 
-					i = i + 1
-
 				end
+
+					#The slot is now complete. Rapid feed to Z zero to prepare for the next machining operation.
+					puts "G0Z0.0"
 
 		end
 
@@ -187,8 +178,6 @@ class ClampMaker
 
 					end
 
-					#puts "(TEST: The final XY pass in create_XY_slot_profile_toolpath is starting)"
-
 					#create the final passes to machine the final inner profile of the slot
 					#feed in the +X direction to the position where the tool edge is at the final profile of the slot
 					puts "G1X#{(@half_width + @slot_width/2 - @tool_radius).round(3)}F#{@xy_feedrate}"
@@ -204,6 +193,7 @@ class ClampMaker
 
 					#make the final counter-clockwise circular interpolation pass about the bottom radius of the slot
 					puts "G3X#{(@half_width + @slot_width/2 - @tool_radius).round(3)}I#{(@slot_width/2 - @tool_radius).round(3)}F#{@xy_feedrate}" 
+
 				end
 
 
@@ -211,14 +201,19 @@ class ClampMaker
 
 		def create_outer_profile_toolpath
 
-			#rapid feed to the safe z height to prepare for XY motion
+			#rapid feed up in Z by one safe Z height amount to prepare for XY motion
+			puts "G91"
 			puts "G0Z#{@safe_z_height.round(3)}"
+			puts "G90"
 
 			#rapid feed to the XY coordinates for a Z plunge at the top of the lower right radius of the clamp
 			puts "G0X#{(@width + @tool_radius).round(3)}Y#{@small_profile_radius.round(3)}"
 
-			#rapid feed/plunge to one tool radius above Z=0
-			puts "G0Z#{@tool_radius}"
+			#rapid feed/plunge to one tool radius above the machined material
+			#feed/plunge to Z zero, immediately followed by the loop that incrementally feeds/plunges into the material in Z to prepare for end-milling
+			puts "G91"
+			puts "G0Z-#{(@safe_z_height - @tool_radius).round(3)}"
+			puts "G1Z-#{(@tool_radius).round(3)}F#{@z_feedrate}"
 			
 			#specify a variable to store the amount of material that is not yet machined
 			remaining_Z_stock = @material_thickness
@@ -228,7 +223,7 @@ class ClampMaker
 
 					#feed/plunge down in Z by an increment of one axial depth of cut
 					puts "G91"
-					puts "G1Z-#{@axial_depth_of_cut.round(3)}F#{@z_feedrate}"
+					puts "G1Z-#{(@axial_depth_of_cut).round(3)}F#{@z_feedrate}"
 					puts "G90"
 
 					#create an XY toolpath for machining the outside profile
