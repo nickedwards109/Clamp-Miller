@@ -40,8 +40,8 @@ class ClampMaker
 			#specify a variable to store the amount of material that is not yet machined
 			remaining_Z_stock = @material_thickness
 
-				#create multiple successive profile passes while incrementing the axial depth of cut
-				while (remaining_Z_stock + @tool_radius) > 0
+				#create multiple successive profile passes while incrementing the axial depth of cut. stop doing this when the entire tool radius has completely machined through the material stock.
+				while (remaining_Z_stock + 2*@tool_radius) > 0
 
 					#rapid feed up in Z by one safe Z height amount to prepare for XY motion
 					puts "G91"
@@ -113,7 +113,7 @@ class ClampMaker
 			remaining_Z_stock = @material_thickness
 
 				#create multiple successive profile passes while incrementing the axial depth of cut
-				while (remaining_Z_stock + @tool_radius) > 0
+				while (remaining_Z_stock + 2*@tool_radius) > 0
 
 					#rapid feed up in Z by one safe Z height amount to prepare for XY motion
 					puts "G91"
@@ -219,7 +219,7 @@ class ClampMaker
 			remaining_Z_stock = @material_thickness
 
 				#create multiple successive profile passes while incrementing the axial depth of cut
-				while (remaining_Z_stock + @tool_radius) > 0
+				while (remaining_Z_stock + 2*@tool_radius) > 0
 
 					#feed/plunge down in Z by an increment of one axial depth of cut
 					puts "G91"
@@ -232,6 +232,15 @@ class ClampMaker
 					remaining_Z_stock = remaining_Z_stock - @axial_depth_of_cut
 
 				end
+
+					#The entire clamp is now complete. Rapid feed to the safe Z height.
+					puts "G0Z#{safe_z_height}"
+
+					#Rapid feed to X zero and Y zero
+					puts "G0X0.0Y0.0"
+
+					#Feed to Z zero
+					puts "G1Z0.0"
 
 		end
 
