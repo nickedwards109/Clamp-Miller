@@ -234,7 +234,7 @@ class ClampMaker
 				end
 
 					#The entire clamp is now complete. Rapid feed to the safe Z height.
-					puts "G0Z#{safe_z_height}"
+					puts "G0Z#{@safe_z_height}"
 
 					#Rapid feed to X zero and Y zero
 					puts "G0X0.0Y0.0"
