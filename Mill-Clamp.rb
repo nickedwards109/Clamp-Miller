@@ -36,7 +36,7 @@ puts "What is the axial depth of cut?"
 puts "What is a safe Z height that the tool will retract to before rapid feed to a new XY location?"
 	 safe_z_height = Float(gets)
 
-puts "Here is your CNC program:"
+puts "Here is your CNC program: (Edit this to add spindle speed, coolant control, tool numbers, etc. as necessary)"
 puts ""
 
 clampmaker = ClampMaker.new(length, width, material_thickness, hole_diameter, slot_to_hole_distance, slot_width, slot_to_end_of_clamp_distance, tool_radius, xy_feedrate, z_feedrate, axial_depth_of_cut, safe_z_height)

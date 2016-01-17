@@ -1,8 +1,10 @@
-This program prompts the user to provide 6 inputs for the geometry of a clamp to be used in milling workholding applications. The program also prompts for several machining parameters. The program then generates a CNC milling G-code program which will machine the clamp. 
+This software prompts the user to provide 6 inputs for the geometry of a clamp to be used in milling workholding applications. The software also prompts for several machining parameters. The software then generates a CNC milling G-code program which will machine the clamp. 
+
+The generated program only controls feed motions and feedrate speeds. Other control-specific parameters, such as spindle speed, coolant control, tool numbers, etc. will have to be manually added to this program before running it in the CNC machine.
 
 In order to execute this program, you must first be able to navigate your computer's file directory from a console, and you must have Ruby 2.0.0 installed. Other Ruby versions may work as well, but are untested.
 
-To execute this program, first download the .zip file and extract the contents to a directory of your choice. Then, within that directory, execute: 
+To execute this program, first download the .zip file and extract the contents to a directory of your choice. Then, access that directory from your console and execute:
 
 ```bash
 `ruby Mill-Clamp.rb`
@@ -54,7 +56,7 @@ What is the axial depth of cut?
 What is a safe Z height that the tool will retract to before rapid feed to a new XY location?
 0.25
 
-Here is your CNC program:
+Here is your CNC program: (Edit this to add spindle speed, coolant control, tool numbers, etc. as necessary)
 
 G91
 G0Z0.25
