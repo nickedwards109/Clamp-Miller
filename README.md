@@ -595,3 +595,5 @@ G1X1.063Y0.25F10.0
 G0Z0.25
 G0X0.0Y0.0
 G1Z0.0
+
+This application was authored by Nick Edwards in 2015-2016. To contribute to this code base, create a pull request to https://github.com/edwardsCNC/Mill-Clamp
