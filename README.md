@@ -1,4 +1,4 @@
-This program prompts the user to provide 7 inputs for the geometry of a clamp to be used in milling workholding applications. The program also prompts for several machining parameters. The program then generates a CNC milling G-code program which will machine the clamp. 
+This program prompts the user to provide 6 inputs for the geometry of a clamp to be used in milling workholding applications. The program also prompts for several machining parameters. The program then generates a CNC milling G-code program which will machine the clamp. 
 
 In order to execute this program, you must first be able to navigate your computer's file directory from a console, and you must have Ruby 2.0.0 installed. Other Ruby versions may work as well, but are untested.
 
@@ -17,30 +17,43 @@ When setting up the CNC milling machine, follow these instructions: Use a slot d
 Here is an example of a console session:
 
 ruby Mill-Clamp.rb
-(Dimension #1) What is the length of the clamp?
+
+(Dimension #1): What is the length of the clamp?
 1.75
-(Dimension #2) What is the width of the clamp?
+
+(Dimension #2): What is the width of the clamp?
 1.0
-(Dimension #3) There will be a hole for housing the height adjustment screw. What is the diameter of this height adjustment screw hole?
+
+(Dimension #3): There will be a hole for housing the height adjustment screw. What is the diameter of this height adjustment screw hole?
 0.325
-(Dimension #4) There will be a slot for the fastening screw. One end of the slot (at the center of the slot end's radius) will have a certain distance to the height adjustment screw hole. What is this distance?
+
+(Dimension #4): There will be a slot for the fastening screw. One end of the slot (at the center of the slot end's radius) will have a certain distance to the height adjustment screw hole. What is this distance?
 0.5
-(Dimension #5) The opposite end of the slot will have a certain distance to the end of the clamp. What is this distance?
+
+(Dimension #5): The opposite end of the slot will have a certain distance to the end of the clamp. What is this distance?
 0.5
-(Dimension #6) How wide is the slot?
+
+(Dimension #6): How wide is the slot?
 0.2
-(Dimension #7) What is the thickness of the material stock?
+
+(Dimension #7): What is the thickness of the material stock?
 0.8
+
 What is the tool radius?
 0.0625
-What is the XY feedrate? This is the feedrate used for end-milling.
+
+What is the XY end-milling feedrate?
 10.0
-What is the Z feedrate? This is the feedrate used for plunging to the next depth of cut.
+
+What is the Z plunge feedrate?
 10.0
+
 What is the axial depth of cut?
 0.0625
+
 What is a safe Z height that the tool will retract to before rapid feed to a new XY location?
 0.25
+
 Here is your CNC program:
 
 G91
