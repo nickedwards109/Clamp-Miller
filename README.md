@@ -59,6 +59,8 @@ What is the axial depth of cut?
 What is a safe Z height that the tool will retract to before rapid feed to a new XY location?
 0.25
 
+When setting up the CNC milling machine, follow these instructions: Use a slot drill (an end mill that can plunge in -Z). Set X=0 and Y=0 on the workpiece such that the Cartesian quadrant within X>0 and Y>0 is solid workpiece material. When running the CNC program, start with the tool at X=0, Y=0, and Z=0.
+
 Here is your CNC program: (Edit this to add spindle speed, coolant control, tool numbers, etc. as necessary)
 
    G91  
