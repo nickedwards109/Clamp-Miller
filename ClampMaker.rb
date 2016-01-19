@@ -158,7 +158,7 @@ class ClampMaker
 					while (remaining_XY_slot_stock/2) > @tool_radius
 
 						#feed in the +X direction by one tool radius to prepare for an inner profile climb milling cut
-						puts "G1X#{(@half_width + i*@tool_radius).round(3)}F#{@xy_feedrate}F#{@xy_feedrate}"
+						puts "G1X#{(@half_width + i*@tool_radius).round(3)}F#{@xy_feedrate}"
 
 						#make a linear interpolation climb milling pass in the +Y direction
 						puts "G1Y#{(@length - @large_profile_radius - @slot_to_hole_distance).round(3)}F#{@xy_feedrate}"
