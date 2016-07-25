@@ -1,4 +1,4 @@
-require './ClampMaker.rb'
+require '../lib/ClampMaker.rb'
 
 puts "(Dimension #1): What is the length of the clamp?"
 	 length = Float(gets)
