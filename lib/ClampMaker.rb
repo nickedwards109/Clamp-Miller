@@ -2,21 +2,23 @@ class ClampMaker
 
 
 
-	def initialize(length, width, material_thickness, hole_diameter, slot_to_hole_distance, slot_width, slot_to_end_of_clamp_distance, tool_radius, xy_feedrate, z_feedrate, axial_depth_of_cut, safe_z_height)
+	def initialize(length, width, material_thickness, xy_feedrate, z_feedrate, axial_depth_of_cut)
 		
+		# User-defined instance variables
 		@length = length
 		@width = width
 		@material_thickness = material_thickness
-		@hole_diameter = hole_diameter
-		@slot_to_hole_distance = slot_to_hole_distance
-		@slot_width = slot_width
-		@slot_to_end_of_clamp_distance = slot_to_end_of_clamp_distance
-		@tool_radius = tool_radius
 		@xy_feedrate = xy_feedrate
 		@z_feedrate = z_feedrate
 		@axial_depth_of_cut = axial_depth_of_cut
-		@safe_z_height = safe_z_height
 
+		# Default instance variables
+		@hole_diameter = 0.325
+		@slot_to_hole_distance = 0.5
+		@slot_width = 0.2
+		@slot_to_end_of_clamp_distance = 0.5
+		@tool_radius = 0.0625
+		@safe_z_height = 0.125
 		@large_profile_radius = width/2
 		@small_profile_radius = width/4
 		@half_width = width/2
