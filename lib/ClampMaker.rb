@@ -25,7 +25,21 @@ class ClampMaker
 
 	end
 
+	def x_position_for_cutting_hole
+		(@half_width + 0.5*@hole_diameter - @tool_radius).round(3)
+	end
 
+	def y_position_for_cutting_hole
+        (@length - @half_width).round(3)
+	end
+
+	def i_offset_for_cutting_hole
+		-(0.5*@hole_diameter - @tool_radius).round(3)
+	end
+
+	def j_offset_for_cutting_hole
+		0.0
+	end
 
 	def create_toolpaths
 
@@ -76,10 +90,10 @@ class ClampMaker
 				def create_XY_hole_profile_toolpath
 
 					# Move to the furthest X position in the hole to prepare for cutting the diameter of the hole.
-					puts "G1X#{(@half_width + 0.5*@hole_diameter - @tool_radius).round(3)}Y#{(@length - @half_width).round(3)}F#{@xy_feedrate}"
+					puts "G1X#{x_position_for_cutting_hole}Y#{y_position_for_cutting_hole}F#{@xy_feedrate}"
 
 					# Cut the diameter of the hole.
-					puts "G3X#{(@half_width + 0.5*@hole_diameter - @tool_radius).round(3)}Y#{(@length - @half_width).round(3)}I#{-(0.5*@hole_diameter - @tool_radius).round(3)}J0.0F#{@xy_feedrate}"
+					puts "G3X#{x_position_for_cutting_hole}Y#{y_position_for_cutting_hole}I#{i_offset_for_cutting_hole}J#{j_offset_for_cutting_hole}F#{@xy_feedrate}"
 
 				end
 
