@@ -75,35 +75,11 @@ class ClampMaker
 
 				def create_XY_hole_profile_toolpath
 
-					#The tool is plunged into the material by one axial depth of cut. 
-					#the tool has not yet made any other circular passes to machine the hole's inner profile. 
+					# Move to the furthest X position in the hole to prepare for cutting the diameter of the hole.
+					puts "G1X#{(@half_width + 0.5*@hole_diameter - @tool_radius).round(3)}Y#{(@length - @half_width).round(3)}F#{@xy_feedrate}"
 
-					#set a variable to represent remaining inner profile hole stock in the XY plane (as a diameter)
-					remaining_XY_hole_stock = @hole_diameter - 2*@tool_radius
-
-					#define a counting variable
-					i = 1
-
-					#rough out the hole diameter until there is less than one tool radius of stock remaining on each opposing side
-					while (remaining_XY_hole_stock/2) > @tool_radius
-
-						#feed into the material in the +X direction by an amount of one tool radius in order to prepare for a circular pass
-						puts "G1X#{(@large_profile_radius + i*@tool_radius).round(3)}F#{@xy_feedrate}"
-
-						#make a single climb milling circular pass. the final XY values are equivalent to the XY values before the G3 command, creating a complete circle centered about X = @large_profile_radius and Y = length - @large_profile_radius
-						puts "G3X#{(@large_profile_radius + i*@tool_radius).round(3)}Y#{(@length - @large_profile_radius).round(3)}I-#{i*@tool_radius.round(3)}J0.0F#{@xy_feedrate}"
-
-						remaining_XY_hole_stock = remaining_XY_hole_stock - 2*@tool_radius
-
-						i = i + 1
-
-					end
-
-					#move to furthest X position in the hole to prepare for machining the final diameter of the hole
-					puts "G1X#{(@large_profile_radius - 0.5*@hole_diameter + @tool_radius).round(3)}F#{@xy_feedrate}"
-
-					#create the final pass to machine the final the diameter of the hole
-					puts "G3X#{(@large_profile_radius - 0.5*@hole_diameter + @tool_radius).round(3)}Y#{(@length - @large_profile_radius).round(3)}I#{(0.5*@hole_diameter - @tool_radius).round(3)}J0.0F#{@xy_feedrate}"
+					# Cut the diameter of the hole.
+					puts "G3X#{(@half_width + 0.5*@hole_diameter - @tool_radius).round(3)}Y#{(@length - @half_width).round(3)}I#{-(0.5*@hole_diameter - @tool_radius).round(3)}J0.0F#{@xy_feedrate}"
 
 				end
 
