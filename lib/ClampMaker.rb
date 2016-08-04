@@ -155,7 +155,7 @@ class ClampMaker
 						puts "G1Y#{@slot_to_end_of_clamp_distance.round(3)}F#{@xy_feedrate}"
 
 						#make a counter-clockwise circular interpolation pass about the bottom radius of the slot
-						puts "G3X#{(@half_width + i*@tool_radius).round(3)}I#{(i*@tool_radius).round(3)}F#{@xy_feedrate}" 
+						puts "G3X#{(@half_width + i*@tool_radius).round(3)}I#{(i*@tool_radius).round(3)}J0.0F#{@xy_feedrate}" 
 
 						remaining_XY_slot_stock = remaining_XY_slot_stock - 2*@tool_radius
 
@@ -177,7 +177,7 @@ class ClampMaker
 					puts "G1Y#{@slot_to_end_of_clamp_distance.round(3)}F#{@xy_feedrate}"
 
 					#make the final counter-clockwise circular interpolation pass about the bottom radius of the slot
-					puts "G3X#{(@half_width + @slot_width/2 - @tool_radius).round(3)}I#{(@slot_width/2 - @tool_radius).round(3)}F#{@xy_feedrate}" 
+					puts "G3X#{(@half_width + @slot_width/2 - @tool_radius).round(3)}I#{(@slot_width/2 - @tool_radius).round(3)}J0.0F#{@xy_feedrate}" 
 
 				end
 
