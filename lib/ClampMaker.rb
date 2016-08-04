@@ -25,78 +25,71 @@ class ClampMaker
 
 	end
 
-	def x_position_for_cutting_hole
-		(@half_width + 0.5*@hole_diameter - @tool_radius).round(3)
-	end
+	# Methods for setting positional targets for CNC code generators
 
-	def y_position_for_cutting_hole
-		(@length - @half_width).round(3)
-	end
+		def x_position_for_cutting_hole
+			(@half_width + 0.5*@hole_diameter - @tool_radius).round(3)
+		end
 
-	def i_offset_for_cutting_hole
-		-(0.5*@hole_diameter - @tool_radius).round(3)
-	end
+		def y_position_for_cutting_hole
+			(@length - @half_width).round(3)
+		end
 
-	def j_offset_for_cutting_hole
-		0.0
-	end
+		def i_offset_for_cutting_hole
+			-(0.5*@hole_diameter - @tool_radius).round(3)
+		end
 
-	def create_toolpaths
+		def j_offset_for_cutting_hole
+			0.0
+		end
 
-		self.create_hole_toolpath
-		self.create_slot_toolpath
-		self.create_outer_profile_toolpath
+	# Methods for generating modular snippets of CNC code
 
-	end
+		def create_XY_hole_profile_toolpath
 
+			# Move to the furthest X position in the hole to prepare for cutting the diameter of the hole.
+			puts "G1X#{x_position_for_cutting_hole}Y#{y_position_for_cutting_hole}F#{@xy_feedrate}"
 
+			# Cut the diameter of the hole.
+			puts "G3X#{x_position_for_cutting_hole}Y#{y_position_for_cutting_hole}I#{i_offset_for_cutting_hole}J#{j_offset_for_cutting_hole}F#{@xy_feedrate}"
+
+		end
 
 		def create_hole_toolpath
 
 			#specify a variable to store the amount of material that is not yet machined
 			remaining_Z_stock = @material_thickness
 
-				#create multiple successive profile passes while incrementing the axial depth of cut. stop doing this when the entire tool radius has completely machined through the material stock.
-				while (remaining_Z_stock + 1.1*@tool_radius) > 0
+			#create multiple successive profile passes while incrementing the axial depth of cut. stop doing this when the entire tool radius has completely machined through the material stock.
+			while (remaining_Z_stock + 1.1*@tool_radius) > 0
 
-					#rapid feed up in Z by one safe Z height amount to prepare for XY motion
-					puts "G91"
-					puts "G0Z#{@safe_z_height.round(3)}"
-					puts "G90"
+				#rapid feed up in Z by one safe Z height amount to prepare for XY motion
+				puts "G91"
+				puts "G0Z#{@safe_z_height.round(3)}"
+				puts "G90"
 
-					#rapid feed to the XY location of the hole
-					puts "G0X#{@large_profile_radius.round(3)}Y#{(@length - @large_profile_radius).round(3)}"
+				#rapid feed to the XY location of the hole
+				puts "G0X#{@large_profile_radius.round(3)}Y#{(@length - @large_profile_radius).round(3)}"
 
-					#rapid feed/plunge to one tool radius above the machined material
-					#feed/plunge into the material in Z by an increment of one axial depth of cut
-					puts "G91"
-					puts "G0Z-#{(@safe_z_height - @tool_radius).round(3)}"
-					puts "G1Z-#{(@axial_depth_of_cut + @tool_radius).round(3)}F#{@z_feedrate}"
-					puts "G90"
+				#rapid feed/plunge to one tool radius above the machined material
+				#feed/plunge into the material in Z by an increment of one axial depth of cut
+				puts "G91"
+				puts "G0Z-#{(@safe_z_height - @tool_radius).round(3)}"
+				puts "G1Z-#{(@axial_depth_of_cut + @tool_radius).round(3)}F#{@z_feedrate}"
+				puts "G90"
 
-					#create an XY toolpath for machining the outside profile
-					self.create_XY_hole_profile_toolpath
+				#create an XY toolpath for machining the outside profile
+				self.create_XY_hole_profile_toolpath
 
-					#there is now one axial depth of cut less of material
-					remaining_Z_stock = remaining_Z_stock - @axial_depth_of_cut
+				#there is now one axial depth of cut less of material
+				remaining_Z_stock = remaining_Z_stock - @axial_depth_of_cut
 
-				end
+			end
 
-					#The hole is now complete. Rapid feed to Z zero to prepare for the next machining operation.
-					puts "G0Z0.0"
+				#The hole is now complete. Rapid feed to Z zero to prepare for the next machining operation.
+				puts "G0Z0.0"
 
-		end
-
-				def create_XY_hole_profile_toolpath
-
-					# Move to the furthest X position in the hole to prepare for cutting the diameter of the hole.
-					puts "G1X#{x_position_for_cutting_hole}Y#{y_position_for_cutting_hole}F#{@xy_feedrate}"
-
-					# Cut the diameter of the hole.
-					puts "G3X#{x_position_for_cutting_hole}Y#{y_position_for_cutting_hole}I#{i_offset_for_cutting_hole}J#{j_offset_for_cutting_hole}F#{@xy_feedrate}"
-
-				end
-
+		end	
 
 
 		def create_slot_toolpath
@@ -257,6 +250,17 @@ class ClampMaker
 					puts "G1X#{(@width + @tool_radius).round(3)}Y#{@small_profile_radius.round(3)}F#{@xy_feedrate}"
 
 				end
+
+
+	# One method to tie it all together and generate all the CNC code!
+
+	def create_toolpaths
+
+		self.create_hole_toolpath
+		self.create_slot_toolpath
+		self.create_outer_profile_toolpath
+
+	end
 
 
 end
