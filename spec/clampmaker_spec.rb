@@ -13,6 +13,17 @@ RSpec.describe ClampMaker do
                                                                       G3X0.85Y2.25I-0.1J0.0F15.0\n  # Cut a circle centered at X0.75 and Y2.25, offset by -0.1 along X and 0.0 along Y
                                                                       /x).to_stdout
       end
+
+      it "generates CNC code for machining a proper slot XY profile" do
+        expect {clampmaker.create_XY_slot_profile_toolpath}.to output(/
+                                                                      G1Y0.5F15.0\n  # Feed in the Y direction to the Y position at the lower end of the slot
+                                                                      G1X0.788F15.0\n  # Feed in the X direction to the X position on the right edge of the slot
+                                                                      G1Y1.75F15.0\n  # Feed in the Y direction to the Y position at the upper end of the slot
+                                                                      G3X0.713I-0.038J0.0F15.0\n # Cut a half-circle, ending at the left edge of the slot, offset by -.038 along X and 0.0 along Y
+                                                                      G1Y0.5F15.0\n  # Feed in the Y direction to the Y position at the lower end of the slot
+                                                                      G3X0.788I0.038J0.0F15.0\n # Cut a half-circle, ending at the right edge of the slot, offset by .038 along X and 0.0 along Y
+                                                                      /x).to_stdout
+      end
       
   end
 
@@ -22,8 +33,6 @@ RSpec.describe ClampMaker do
   context "length: 3.0, width: 1.5, material_thickness: 0.25, xy_feedrate: 15.0, z_feedrate: 10.0, axial_depth_of_cut: 0.2" do
   let(:clampmaker) { ClampMaker.new(3.0, 1.5, 0.25, 15.0, 10.0, 0.2) }
 
-    # This test uses x at the end of the regexp to ignore whitespace and comments...
-    # ...which allows the matcher to be broken up over many lines, improving readability.
     it "generates CNC code for machining a hole all the way through the material in the Z axis" do
       expect {clampmaker.create_hole_toolpath}.to output(/
                                                         # First cutting pass
