@@ -133,37 +133,6 @@ class ClampMaker
 					#feed to the Y position at the end of the slot opposite the hole
 					puts "G1Y#{@slot_to_end_of_clamp_distance.round(3)}F#{@xy_feedrate}"
 
-					#set a variable to represent total slot stock remaining on both opposing sides
-					remaining_XY_slot_stock = @slot_width - 2*@tool_radius
-
-					#define a counting variable
-					i = 1
-
-					#rough out the inner slot profile until there is less than one tool radius of stock remaining on both opposing sides
-					while (remaining_XY_slot_stock/2) > @tool_radius
-
-						#feed in the +X direction by one tool radius to prepare for an inner profile climb milling cut
-						puts "G1X#{(@half_width + i*@tool_radius).round(3)}F#{@xy_feedrate}"
-
-						#make a linear interpolation climb milling pass in the +Y direction
-						puts "G1Y#{(@length - @large_profile_radius - @slot_to_hole_distance).round(3)}F#{@xy_feedrate}"
-
-						#make a counter-clockwise circular interpolation pass about the top radius of the slot
-						puts "G3X#{(@half_width - i*@tool_radius).round(3)}I-#{(i*@tool_radius).round(3)}J0.0F#{@xy_feedrate}"
-
-						#make a linear interpolation climb milling pass in the -Y direction
-						puts "G1Y#{@slot_to_end_of_clamp_distance.round(3)}F#{@xy_feedrate}"
-
-						#make a counter-clockwise circular interpolation pass about the bottom radius of the slot
-						puts "G3X#{(@half_width + i*@tool_radius).round(3)}I#{(i*@tool_radius).round(3)}J0.0F#{@xy_feedrate}" 
-
-						remaining_XY_slot_stock = remaining_XY_slot_stock - 2*@tool_radius
-
-						i = i + 1
-
-					end
-
-					#create the final passes to machine the final inner profile of the slot
 					#feed in the +X direction to the position where the tool edge is at the final profile of the slot
 					puts "G1X#{(@half_width + @slot_width/2 - @tool_radius).round(3)}F#{@xy_feedrate}"
 
