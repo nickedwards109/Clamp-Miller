@@ -30,7 +30,7 @@ class ClampMaker
 	end
 
 	def y_position_for_cutting_hole
-        (@length - @half_width).round(3)
+		(@length - @half_width).round(3)
 	end
 
 	def i_offset_for_cutting_hole
@@ -57,7 +57,7 @@ class ClampMaker
 			remaining_Z_stock = @material_thickness
 
 				#create multiple successive profile passes while incrementing the axial depth of cut. stop doing this when the entire tool radius has completely machined through the material stock.
-				while (remaining_Z_stock + 2*@tool_radius) > 0
+				while (remaining_Z_stock + 1.1*@tool_radius) > 0
 
 					#rapid feed up in Z by one safe Z height amount to prepare for XY motion
 					puts "G91"
