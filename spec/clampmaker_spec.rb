@@ -60,6 +60,42 @@ RSpec.describe ClampMaker do
                                                         G0Z0.0\n  # Return to the surface of the material
                                                         /x).to_stdout
     end
+
+    it "generates CNC code for machining a slot all the way through the material in the Z axis" do
+      expect {clampmaker.create_slot_toolpath}.to output(/
+                                                        # First cutting pass
+                                                        G91\n  # Set incremental mode
+                                                        G0Z0.125\n  # Rapid feed up in Z by one tool diameter
+                                                        G90\n  # Set absolute mode
+                                                        G0X0.75Y1.75\n  # Rapid feed to the XY position of the slot end diameter center
+                                                        G91\n  # Set incremental mode
+                                                        G0Z-0.063\n  # Rapid feed to tone tool radius above the material
+                                                        G1Z-0.263F10.0\n  # Feed one depth of cut into the material
+                                                        G90\n  # Set absolute mode
+                                                        G1Y0.5F15.0\n  # Feed through the X middle of the slot to the Y position at the lower end of the slot
+                                                        G1X0.788F15.0\n  # Feed to the X position where the edge of the tool is at the right edge of the slot
+                                                        G1Y1.75F15.0\n  # Feed along the right edge of the slot to the Y position at the upper end of the slot
+                                                        G3X0.713I-0.038J0.0F15.0\n  # Make a counter-clockwise circular interpolation pass about the upper radius of the slot
+                                                        G1Y0.5F15.0\n  # Feed along the left edge of the slot to the Y position at the lower end of the slot
+                                                        G3X0.788I0.038J0.0F15.0\n  # Make a counter-clockwise circular interpolation pass about the lower radius of the slot
+                                                        # Second cutting pass
+                                                        G91\n  # Set incremental mode
+                                                        G0Z0.125\n  # Rapid feed up in Z by one tool diameter
+                                                        G90\n  # Set absolute mode
+                                                        G0X0.75Y1.75\n  # Rapid feed to the XY position of the slot end diameter center
+                                                        G91\n  # Set incremental mode
+                                                        G0Z-0.063\n  # Rapid feed to tone tool radius above the material
+                                                        G1Z-0.263F10.0\n  # Feed one depth of cut into the material
+                                                        G90\n  # Set absolute mode
+                                                        G1Y0.5F15.0\n  # Feed through the X middle of the slot to the Y position at the lower end of the slot
+                                                        G1X0.788F15.0\n  # Feed to the X position where the edge of the tool is at the right edge of the slot
+                                                        G1Y1.75F15.0\n  # Feed along the right edge of the slot to the Y position at the upper end of the slot
+                                                        G3X0.713I-0.038J0.0F15.0\n  # Make a counter-clockwise circular interpolation pass about the upper radius of the slot
+                                                        G1Y0.5F15.0\n  # Feed along the left edge of the slot to the Y position at the lower end of the slot
+                                                        G3X0.788I0.038J0.0F15.0\n  # Make a counter-clockwise circular interpolation pass about the lower radius of the slot
+                                                        G0Z0.0\n  # Return to Z zero
+                                                        /x).to_stdout
+    end
       
   end
 
