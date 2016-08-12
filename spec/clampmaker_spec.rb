@@ -24,6 +24,17 @@ RSpec.describe ClampMaker do
                                                                       G3X0.788I0.038J0.0F15.0\n # Cut a half-circle, ending at the right edge of the slot, offset by .038 along X and 0.0 along Y
                                                                       /x).to_stdout
       end
+
+      it "generates CNC code for machining a proper outer XY profile" do
+        expect {clampmaker.create_XY_outer_profile_toolpath}.to output(/
+                                                                      G2X1.125Y-0.063I-0.438J0.0F15.0\n  # Counter-clockwise circular interpolation feed to machine the lower right profile radius
+                                                                      G1X0.375F15.0\n  # Feed to an X location of one small profile radius from the left side
+                                                                      G2X-0.063Y0.375I0.0J0.438F15.0\n # Counter-clockwise circular interpolation feed to machine the lower left profile radius
+                                                                      G1Y2.25F15.0\n # Feed to a Y location of the clamp length minus the large profile radius
+                                                                      G2X1.563Y2.25I0.813J0.0F15.0\n # Counter-clockwise circular interpolation feed to machine the large profile radius
+                                                                      G1X1.563Y0.375F15.0\n # Feed to the starting position
+                                                                      /x).to_stdout
+      end
       
   end
 
