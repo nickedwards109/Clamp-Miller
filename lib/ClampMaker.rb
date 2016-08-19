@@ -167,10 +167,16 @@ class ClampMaker
 			#feed/plunge to Z zero, immediately followed by the loop that incrementally feeds/plunges into the material in Z to prepare for end-milling
 			puts "G91"
 			puts "G0Z-#{(@safe_z_height - @tool_radius).round(3)}"
-			puts "G1Z-#{(@tool_radius).round(3)}F#{@z_feedrate}"
+			puts "G1Z-#{(@tool_radius + @axial_depth_of_cut).round(3)}F#{@z_feedrate}"
+			puts "G90"
+
+			#the tool is now one axial depth of cut into the material, so make an initial cutting pass.
+			#for subsequent passes, the depth of cut will be incremented for each pass, without the need to approach form a safe Z height.
+			self.create_XY_outer_profile_toolpath
 			
-			#specify a variable to store the amount of material that is not yet machined
-			remaining_Z_stock = @material_thickness
+			#specify a variable to store the amount of material that is not yet machined. 
+			#here, one cutting pass has already been done. 
+			remaining_Z_stock = @material_thickness - @axial_depth_of_cut
 
 				#create multiple successive profile passes while incrementing the axial depth of cut
 				while (remaining_Z_stock + 2*@tool_radius) > 0
