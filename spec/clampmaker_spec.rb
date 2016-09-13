@@ -3,48 +3,13 @@ require './spec_helper.rb'
 
 RSpec.describe ClampMaker do 
 
-  # Tests for methods that generate CNC code which cuts in the XY plane
-  context "length: 3.0, width: 1.5, material_thickness: 0.5, xy_feedrate: 15.0, z_feedrate: 10.0, axial_depth_of_cut: 0.15" do
-    let(:clampmaker) { ClampMaker.new(3.0, 1.5, 0.5, 15.0, 10.0, 0.15) }
-
-      it "generates CNC code for machining a proper hole XY profile" do
-        expect {clampmaker.create_XY_hole_profile_toolpath}.to output(/
-                                                                      G1X0.85Y2.25F15.0\n # Feed to the XY position for starting to cut the hole, at X0.85 and Y2.25
-                                                                      G3X0.85Y2.25I-0.1J0.0F15.0\n  # Cut a circle centered at X0.75 and Y2.25, offset by -0.1 along X and 0.0 along Y
-                                                                      /x).to_stdout
-      end
-
-      it "generates CNC code for machining a proper slot XY profile" do
-        expect {clampmaker.create_XY_slot_profile_toolpath}.to output(/
-                                                                      G1Y0.5F15.0\n  # Feed in the Y direction to the Y position at the lower end of the slot
-                                                                      G1X0.788F15.0\n  # Feed in the X direction to the X position on the right edge of the slot
-                                                                      G1Y1.75F15.0\n  # Feed in the Y direction to the Y position at the upper end of the slot
-                                                                      G3X0.713I-0.038J0.0F15.0\n # Cut a half-circle, ending at the left edge of the slot, offset by -.038 along X and 0.0 along Y
-                                                                      G1Y0.5F15.0\n  # Feed in the Y direction to the Y position at the lower end of the slot
-                                                                      G3X0.788I0.038J0.0F15.0\n # Cut a half-circle, ending at the right edge of the slot, offset by .038 along X and 0.0 along Y
-                                                                      /x).to_stdout
-      end
-
-      it "generates CNC code for machining a proper outer XY profile" do
-        expect {clampmaker.create_XY_outer_profile_toolpath}.to output(/
-                                                                      G2X1.125Y-0.063I-0.438J0.0F15.0\n  # Counter-clockwise circular interpolation feed to machine the lower right profile radius
-                                                                      G1X0.375F15.0\n  # Feed to an X location of one small profile radius from the left side
-                                                                      G2X-0.063Y0.375I0.0J0.438F15.0\n # Counter-clockwise circular interpolation feed to machine the lower left profile radius
-                                                                      G1Y2.25F15.0\n # Feed to a Y location of the clamp length minus the large profile radius
-                                                                      G2X1.563Y2.25I0.813J0.0F15.0\n # Counter-clockwise circular interpolation feed to machine the large profile radius
-                                                                      G1X1.563Y0.375F15.0\n # Feed to the starting position
-                                                                      /x).to_stdout
-      end
-      
-  end
-
-  # Tests for methods that generate CNC code which cuts all the way through the material in the Z axis.
-  # These tests are facilitated by a relatively smaller material thickness and larger axial depth of cut...
+  # Specs for the three methods that generate all of the CNC code for making a clamp.
+  # These specs are facilitated by a small material thickness and large axial depth of cut...
   # ...which results in fewer cutting passes and less code in the RSpec matcher
   context "length: 3.0, width: 1.5, material_thickness: 0.25, xy_feedrate: 15.0, z_feedrate: 10.0, axial_depth_of_cut: 0.2" do
   let(:clampmaker) { ClampMaker.new(3.0, 1.5, 0.25, 15.0, 10.0, 0.2) }
 
-    it "generates CNC code for machining a hole all the way through the material in the Z axis" do
+    it "generates CNC code for machining the clamp's hole" do
       expect {clampmaker.create_hole_toolpath}.to output(/
                                                         # First cutting pass
                                                         G91\n  # Set incremental mode
@@ -72,7 +37,7 @@ RSpec.describe ClampMaker do
                                                         /x).to_stdout
     end
 
-    it "generates CNC code for machining a slot all the way through the material in the Z axis" do
+    it "generates CNC code for machining the clamp's slot" do
       expect {clampmaker.create_slot_toolpath}.to output(/
                                                         # First cutting pass
                                                         G91\n  # Set incremental mode
@@ -108,7 +73,7 @@ RSpec.describe ClampMaker do
                                                         /x).to_stdout
     end
 
-    it "generates CNC code for machining the outer profile all the way through the material in the Z axis" do
+    it "generates CNC code for machining the clamp's outer profile" do
       expect {clampmaker.create_outer_profile_toolpath}.to output(/
                                                                  # First cutting pass
                                                                  G91\n  # Set incremental mode
