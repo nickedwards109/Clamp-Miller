@@ -25,6 +25,233 @@ class ClampMaker
 
 	end
 
+
+	# These methods generate CNC code according to the following conventions:
+	#
+	# '_as_an_increment' refers to a motion that is incremental from the start position.
+	# All other motions are to a certain absolute position, regardless of the start position.
+	#
+	# "rapid_feed" refers to a motion where the cutting tool moves through air as fast as possible.
+	# "cut" refers to a motion where the cutting tool cuts through material.
+	# "rightward" refers to a motion in the +X direction.
+	# "leftward" refers to a motion in the -X direction.
+	# "forward" refers to a motion in the +Y direction.
+	# "backward" refers to a motion in the -Y direction.
+	# "up" refers to a motion in the +Z direction.
+	# "down" refers to a motion in the -Z direction.
+
+
+	def create_hole_toolpath
+
+		remaining_Z_stock = @material_thickness
+
+		until cutting_complete?(remaining_Z_stock)
+
+			rapid_feed_up_one_safe_z_height_as_an_increment
+
+			rapid_feed_to_xy_position_of_hole_center
+
+			rapid_feed_down_then_cut_down_into_material_as_an_increment
+
+			cut_rightward_to_prepare_for_making_hole_diameter
+
+			cut_counter_clockwise_circle_to_make_hole_diameter
+
+			remaining_Z_stock -= @axial_depth_of_cut
+
+		end
+
+		rapid_feed_to_z_zero
+
+	end	
+
+
+	def create_slot_toolpath
+	
+	remaining_Z_stock = @material_thickness
+
+		until cutting_complete?(remaining_Z_stock)
+
+			rapid_feed_up_one_safe_z_height_as_an_increment
+
+			rapid_feed_to_xy_position_of_slot_top_center
+
+			rapid_feed_down_then_cut_down_into_material_as_an_increment
+
+			cut_backward_to_slot_bottom_center
+
+			cut_rightward_to_right_edge_of_slot
+
+			cut_forward_to_top_right_edge_of_slot
+
+			cut_counter_clockwise_half_circle_to_make_slot_top_radius
+
+			cut_backward_to_slot_bottom_center
+
+			cut_counter_clockwise_half_circle_to_make_slot_bottom_radius
+
+			remaining_Z_stock -= @axial_depth_of_cut
+
+		end
+
+		rapid_feed_to_z_zero
+
+	end
+
+
+	def create_outer_profile_toolpath
+
+		rapid_feed_up_one_safe_z_height_as_an_increment
+
+		rapid_feed_to_xy_position_at_rear_of_right_profile_edge
+
+		rapid_feed_down_then_cut_down_into_material_as_an_increment
+
+		cut_clockwise_quarter_circle_to_make_rear_right_profile_radius
+
+		cut_leftward_to_make_rear_profile_edge
+
+		cut_clockwise_quarter_circle_to_make_rear_left_profile_radius
+
+		cut_forward_to_make_left_profile_edge
+
+		cut_clockwise_half_circle_to_make_front_profile_radius
+
+		cut_backward_to_rear_of_right_profile_edge
+		
+		remaining_Z_stock = @material_thickness - @axial_depth_of_cut
+
+			#create multiple successive profile passes while incrementing the axial depth of cut
+			until cutting_complete?(remaining_Z_stock)
+
+				cut_down_into_material
+
+				cut_clockwise_quarter_circle_to_make_rear_right_profile_radius
+
+				cut_leftward_to_make_rear_profile_edge
+
+				cut_clockwise_quarter_circle_to_make_rear_left_profile_radius
+
+				cut_forward_to_make_left_profile_edge
+
+				cut_clockwise_half_circle_to_make_front_profile_radius
+
+				cut_backward_to_rear_of_right_profile_edge
+
+				remaining_Z_stock -= @axial_depth_of_cut
+
+			end
+
+				rapid_feed_to_absolute_safe_z_height
+
+				rapid_feed_to_xy_origin
+
+				cut_to_z_zero
+
+	end
+
+	# Methods for generating modular snippets of CNC code
+
+	def rapid_feed_up_one_safe_z_height_as_an_increment
+		puts "G91"
+		puts "G0Z#{safe_z_height}"
+		puts "G90"
+	end
+
+	def rapid_feed_to_xy_position_of_hole_center
+		puts "G0X#{x_position_of_hole_center}Y#{y_position_of_hole_center}"
+	end
+
+	def rapid_feed_down_then_cut_down_into_material_as_an_increment
+		puts "G91"
+		puts "G0Z-#{safe_z_height_less_one_radius}"
+		puts "G1Z-#{axial_depth_of_cut_plus_one_radius}F#{z_feedrate}"
+		puts "G90"
+	end
+
+	def cut_rightward_to_prepare_for_making_hole_diameter
+		puts "G1X#{x_position_at_hole_diameter}Y#{y_position_at_hole_diameter}F#{xy_feedrate}"
+	end
+
+	def cut_counter_clockwise_circle_to_make_hole_diameter
+		puts "G3X#{x_position_at_hole_diameter}Y#{y_position_at_hole_diameter}I#{i_offset_for_hole_radius}J#{j_offset_for_hole_radius}F#{xy_feedrate}"
+	end
+
+	def rapid_feed_to_z_zero
+		puts "G0Z0.0"
+	end
+
+	def rapid_feed_to_xy_position_of_slot_top_center
+		puts "G0X#{x_position_of_slot_center}Y#{y_position_of_slot_top_center}"
+	end
+
+	def cut_backward_to_slot_bottom_center
+		puts "G1Y#{y_position_of_slot_bottom_center}F#{xy_feedrate}"
+	end
+
+	def cut_rightward_to_right_edge_of_slot
+		puts "G1X#{x_position_at_right_slot_edge}F#{xy_feedrate}"
+	end
+
+	def cut_forward_to_top_right_edge_of_slot
+		puts "G1Y#{y_position_of_slot_top_center}F#{xy_feedrate}"
+	end
+
+	def cut_counter_clockwise_half_circle_to_make_slot_top_radius
+		puts "G3X#{x_position_at_left_slot_edge}I-#{i_offset_for_slot_end_radius}J#{j_offset_for_slot_end_radius}F#{xy_feedrate}"
+	end
+
+	def cut_counter_clockwise_half_circle_to_make_slot_bottom_radius
+		puts "G3X#{x_position_at_right_slot_edge}I#{i_offset_for_slot_end_radius}J#{j_offset_for_slot_end_radius}F#{xy_feedrate}"
+	end
+
+	def rapid_feed_to_xy_position_at_rear_of_right_profile_edge
+		puts "G0X#{x_position_for_starting_outside_profile_cut}Y#{y_position_for_starting_outside_profile_cut}"
+	end
+
+	def cut_clockwise_quarter_circle_to_make_rear_right_profile_radius
+		puts "G2X#{x_position_at_bottom_of_lower_right_profile_radius}Y-#{y_position_at_bottom_of_lower_right_profile_radius}I-#{i_offset_for_lower_right_profile_radius}J#{j_offset_for_lower_right_profile_radius}F#{xy_feedrate}"
+	end
+
+	def cut_leftward_to_make_rear_profile_edge
+		puts "G1X#{x_position_at_bottom_of_lower_left_profile_radius}F#{xy_feedrate}"
+	end
+
+	def cut_clockwise_quarter_circle_to_make_rear_left_profile_radius
+		puts "G2X-#{x_position_at_top_of_lower_left_profile_radius}Y#{y_position_at_top_of_lower_left_profile_radius}I#{i_offset_for_lower_left_profile_radius}J#{j_offset_for_lower_left_profile_radius}F#{xy_feedrate}"
+	end
+
+	def cut_forward_to_make_left_profile_edge
+		puts "G1Y#{y_position_at_bottom_of_top_profile_radius}F#{xy_feedrate}"
+	end
+
+	def cut_clockwise_half_circle_to_make_front_profile_radius
+		puts "G2X#{x_position_at_right_side_of_top_profile_radius}Y#{y_position_at_bottom_of_top_profile_radius}I#{i_offset_for_top_profile_radius}J0.0F#{xy_feedrate}"	
+	end
+
+	def cut_backward_to_rear_of_right_profile_edge
+		puts "G1X#{x_position_for_starting_outside_profile_cut}Y#{y_position_for_starting_outside_profile_cut}F#{xy_feedrate}"
+	end
+
+	def cut_down_into_material
+		puts "G91"
+		puts "G1Z-#{(@axial_depth_of_cut).round(3)}F#{z_feedrate}"
+		puts "G90"
+	end
+
+	def rapid_feed_to_absolute_safe_z_height
+		puts "G0Z#{@safe_z_height}"
+	end
+
+	def rapid_feed_to_xy_origin
+		puts "G0X0.0Y0.0"
+	end
+
+	def cut_to_z_zero
+		puts "G1Z0.0"
+	end
+
+
 	# Methods for getting absolute positional targets for CNC code generators.
 	# These methods must be used in absolute mode.
 	# In other words, G90 must be more recent in the generated CNC program than G91.
@@ -165,199 +392,9 @@ class ClampMaker
 		@z_feedrate
 	end
 
-	# Methods for generating modular snippets of CNC code
-
-		def create_XY_hole_profile_toolpath
-
-			# Move to the furthest X position in the hole to prepare for cutting the diameter of the hole.
-			puts "G1X#{x_position_at_hole_diameter}Y#{y_position_at_hole_diameter}F#{xy_feedrate}"
-
-			# Cut the diameter of the hole.
-			puts "G3X#{x_position_at_hole_diameter}Y#{y_position_at_hole_diameter}I#{i_offset_for_hole_radius}J#{j_offset_for_hole_radius}F#{xy_feedrate}"
-
-		end
-
-		def create_hole_toolpath
-
-			#specify a variable to store the amount of material that is not yet machined
-			remaining_Z_stock = @material_thickness
-
-			#create multiple successive profile passes while incrementing the axial depth of cut. stop doing this when the entire tool radius has completely machined through the material stock.
-			while (remaining_Z_stock + 1.1*@tool_radius) > 0
-
-				#rapid feed up in Z by one safe Z height amount to prepare for XY motion
-				puts "G91"
-				puts "G0Z#{safe_z_height}"
-				puts "G90"
-
-				#rapid feed to the XY location of the hole
-				puts "G0X#{x_position_of_hole_center}Y#{y_position_of_hole_center}"
-
-				#rapid feed/plunge to one tool radius above the machined material
-				#feed/plunge into the material in Z by an increment of one axial depth of cut
-				puts "G91"
-				puts "G0Z-#{safe_z_height_less_one_radius}"
-				puts "G1Z-#{axial_depth_of_cut_plus_one_radius}F#{z_feedrate}"
-				puts "G90"
-
-				#create an XY toolpath for machining the outside profile
-				self.create_XY_hole_profile_toolpath
-
-				#there is now one axial depth of cut less of material
-				remaining_Z_stock = remaining_Z_stock - @axial_depth_of_cut
-
-			end
-
-				#The hole is now complete. Rapid feed to Z zero to prepare for the next machining operation.
-				puts "G0Z0.0"
-
-		end	
-
-
-		def create_slot_toolpath
-			
-			#specify a variable to store the amount of material that is not yet machined
-			remaining_Z_stock = @material_thickness
-
-				#create multiple successive profile passes while incrementing the axial depth of cut
-				while (remaining_Z_stock + 2*@tool_radius) > 0
-
-					#rapid feed up in Z by one safe Z height amount to prepare for XY motion
-					puts "G91"
-					puts "G0Z#{safe_z_height}"
-					puts "G90"
-
-					#rapid feed to the XY coordinates at the radius center at the slot top
-					puts "G0X#{x_position_of_slot_center}Y#{y_position_of_slot_top_center}"
-
-					#rapid feed/plunge to one tool radius above the machined material
-					#feed/plunge into the material in Z by an increment of one axial depth of cut
-					puts "G91"
-					puts "G0Z-#{safe_z_height_less_one_radius}"
-					puts "G1Z-#{axial_depth_of_cut_plus_one_radius}F#{z_feedrate}"
-					puts "G90"
-
-					#create an XY toolpath for machining the outside profile
-					self.create_XY_slot_profile_toolpath
-
-					remaining_Z_stock = remaining_Z_stock - @axial_depth_of_cut
-
-				end
-
-					#The slot is now complete. Rapid feed to Z zero to prepare for the next machining operation.
-					puts "G0Z0.0"
-
-		end
-
-
-				def create_XY_slot_profile_toolpath
-
-					#feed to the Y position at the end of the slot opposite the hole
-					puts "G1Y#{y_position_of_slot_bottom_center}F#{xy_feedrate}"
-
-					#feed in the +X direction to the position where the tool edge is at the final profile of the slot
-					puts "G1X#{x_position_at_right_slot_edge}F#{xy_feedrate}"
-
-					#make the final linear interpolation climb milling pass in the +Y direction
-					puts "G1Y#{y_position_of_slot_top_center}F#{xy_feedrate}"
-
-					#make the final counter-clockwise circular interpolation pass about the top radius of the slot
-					puts "G3X#{x_position_at_left_slot_edge}I-#{i_offset_for_slot_end_radius}J#{j_offset_for_slot_end_radius}F#{xy_feedrate}"
-
-					#make the final linear interpolation climb milling pass in the -Y direction
-					puts "G1Y#{y_position_of_slot_bottom_center}F#{xy_feedrate}"
-
-					#make the final counter-clockwise circular interpolation pass about the bottom radius of the slot
-					puts "G3X#{x_position_at_right_slot_edge}I#{i_offset_for_slot_end_radius}J#{j_offset_for_slot_end_radius}F#{xy_feedrate}" 
-
-				end
-
-
-
-
-		def create_outer_profile_toolpath
-
-			#rapid feed up in Z by one safe Z height amount to prepare for XY motion
-			puts "G91"
-			puts "G0Z#{safe_z_height}"
-			puts "G90"
-
-			#rapid feed to the XY coordinates for a Z plunge at the top of the lower right radius of the clamp
-			puts "G0X#{x_position_for_starting_outside_profile_cut}Y#{y_position_for_starting_outside_profile_cut}"
-
-			#rapid feed/plunge to one tool radius above the machined material
-			#feed/plunge to Z zero, immediately followed by the loop that incrementally feeds/plunges into the material in Z to prepare for end-milling
-			puts "G91"
-			puts "G0Z-#{safe_z_height_less_one_radius}"
-			puts "G1Z-#{(@tool_radius + @axial_depth_of_cut).round(3)}F#{z_feedrate}"
-			puts "G90"
-
-			#the tool is now one axial depth of cut into the material, so make an initial cutting pass.
-			#for subsequent passes, the depth of cut will be incremented for each pass, without the need to approach form a safe Z height.
-			self.create_XY_outer_profile_toolpath
-			
-			#specify a variable to store the amount of material that is not yet machined. 
-			#here, one cutting pass has already been done. 
-			remaining_Z_stock = @material_thickness - @axial_depth_of_cut
-
-				#create multiple successive profile passes while incrementing the axial depth of cut
-				while (remaining_Z_stock + 2*@tool_radius) > 0
-
-					#feed/plunge down in Z by an increment of one axial depth of cut
-					puts "G91"
-					puts "G1Z-#{(@axial_depth_of_cut).round(3)}F#{z_feedrate}"
-					puts "G90"
-
-					#create an XY toolpath for machining the outside profile
-					self.create_XY_outer_profile_toolpath
-
-					remaining_Z_stock = remaining_Z_stock - @axial_depth_of_cut
-
-				end
-
-					#The entire clamp is now complete. Rapid feed to the safe Z height.
-					puts "G0Z#{@safe_z_height}"
-
-					#Rapid feed to X zero and Y zero
-					puts "G0X0.0Y0.0"
-
-					#Feed to Z zero
-					puts "G1Z0.0"
-
-		end
-
-				def create_XY_outer_profile_toolpath
-
-					#counter-clockwise circular interpolation feed to machine the lower right profile radius
-					puts "G2X#{x_position_at_bottom_of_lower_right_profile_radius}Y-#{y_position_at_bottom_of_lower_right_profile_radius}I-#{i_offset_for_lower_right_profile_radius}J#{j_offset_for_lower_right_profile_radius}F#{xy_feedrate}"
-
-					#linear interpolation feed to an X location of one small profile radius from the left side
-					puts "G1X#{x_position_at_bottom_of_lower_left_profile_radius}F#{xy_feedrate}"
-
-					#counter-clockwise circular interpolation feed to machine the lower left profile radius
-					puts "G2X-#{x_position_at_top_of_lower_left_profile_radius}Y#{y_position_at_top_of_lower_left_profile_radius}I#{i_offset_for_lower_left_profile_radius}J#{j_offset_for_lower_left_profile_radius}F#{xy_feedrate}"
-
-					#linear interpolation feed to a Y location of the clamp length minus the top profile radius
-					puts "G1Y#{y_position_at_bottom_of_top_profile_radius}F#{xy_feedrate}"
-
-					#counter-clockwise circular interpolation feed to machine the large profile radius
-					puts "G2X#{x_position_at_right_side_of_top_profile_radius}Y#{y_position_at_bottom_of_top_profile_radius}I#{i_offset_for_top_profile_radius}J0.0F#{xy_feedrate}"
-
-					#linear interpolation feed to the starting position
-					puts "G1X#{x_position_for_starting_outside_profile_cut}Y#{y_position_for_starting_outside_profile_cut}F#{xy_feedrate}"
-
-				end
-
-
-	# One method to tie it all together and generate all the CNC code!
-
-	def create_toolpaths
-
-		self.create_hole_toolpath
-		self.create_slot_toolpath
-		self.create_outer_profile_toolpath
-
+	# A method for determining whether the entire material thickness has been cut through
+	def cutting_complete?(remaining_Z_stock)
+		true if (remaining_Z_stock + 1.1*@tool_radius) < 0
 	end
-
 
 end

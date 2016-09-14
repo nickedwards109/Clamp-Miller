@@ -34,4 +34,6 @@ puts "Here is your CNC program: (Edit this to add spindle speed, coolant control
 puts ""
 
 clampmaker = ClampMaker.new(length, width, material_thickness, xy_feedrate, z_feedrate, axial_depth_of_cut)
-clampmaker.create_toolpaths	
+clampmaker.create_hole_toolpath
+clampmaker.create_slot_toolpath
+clampmaker.create_outer_profile_toolpath
