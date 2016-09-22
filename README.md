@@ -1,4 +1,4 @@
-This software prompts the user to provide inputs for the geometry and machining parameters to machine a a clamp to be used in milling workholding applications. It then generates a CNC milling G-code program which will machine the clamp. 
+Mill-Clamp is a CNC programming utility that creates a CNC program which can be used to machine a clamp for milling workholding applications. The output CNC program can be interpreted by a 3-axis CNC machine running [GRBL](https://github.com/grbl/grbl), and the toolpath can be visually previewed at [Q'n'dirty toolpath simulator](https://nraynaud.github.io/webgcode/).
 
 The generated program only controls feed motions and feedrate speeds. Other control-specific parameters, such as spindle speed, coolant control, tool numbers, etc. will have to be manually added to this program before running it in the CNC machine.
 
@@ -10,7 +10,7 @@ Here is an image of a setup for machining a clamp. The outer profile of the clam
 
 In order to run this sofware and generate a CNC program, you must first be able to navigate your computer's file directory and execute commands from a console, and you must have Ruby 2.0.0 installed. Other Ruby versions will probably work as well.
 
-To run the software, first download the .zip file and extract the contents to a directory of your choice. Then, access that directory from your console and execute:
+To run the software, first download the .zip file and extract the contents to a directory of your choice. Then, access the ./bin directory from your console and execute:
 
 ```bash
 ruby Mill-Clamp.rb
