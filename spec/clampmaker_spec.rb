@@ -11,6 +11,7 @@ RSpec.describe ClampMaker do
 
     it "generates CNC code for machining the clamp's hole" do
       expect {clampmaker.create_hole_toolpath}.to output(/
+                                                        \(.+\)\n # Comment in the CNC code. Parentheses followed by one or more of anything followed by parentheses
                                                         # First cutting pass
                                                         G91\n  # Set incremental mode
                                                         G0Z0.125\n  # Rapid feed up in Z by one tool diameter
@@ -39,6 +40,7 @@ RSpec.describe ClampMaker do
 
     it "generates CNC code for machining the clamp's slot" do
       expect {clampmaker.create_slot_toolpath}.to output(/
+                                                        \(.+\)\n # Comment in the CNC code. Parentheses followed by one or more of anything followed by parentheses
                                                         # First cutting pass
                                                         G91\n  # Set incremental mode
                                                         G0Z0.125\n  # Rapid feed up in Z by one tool diameter
@@ -75,6 +77,7 @@ RSpec.describe ClampMaker do
 
     it "generates CNC code for machining the clamp's outer profile" do
       expect {clampmaker.create_outer_profile_toolpath}.to output(/
+                                                                 \(.+\)\n # Comment in the CNC code. Parentheses followed by one or more of anything followed by parentheses
                                                                  # First cutting pass
                                                                  G91\n  # Set incremental mode
                                                                  G0Z0.125\n  # Rapid feed up in Z by one tool diameter
