@@ -43,6 +43,8 @@ class ClampMaker
 
 	def create_hole_toolpath
 
+		insert_comment_to_delineate_hole_section
+
 		remaining_Z_stock = @material_thickness
 
 		until cutting_complete?(remaining_Z_stock)
@@ -67,6 +69,8 @@ class ClampMaker
 
 
 	def create_slot_toolpath
+
+	insert_comment_to_delineate_slot_section
 	
 	remaining_Z_stock = @material_thickness
 
@@ -100,6 +104,8 @@ class ClampMaker
 
 
 	def create_outer_profile_toolpath
+
+		insert_comment_to_delineate_outer_profile_section
 
 		rapid_feed_up_one_safe_z_height_as_an_increment
 
@@ -149,6 +155,22 @@ class ClampMaker
 				cut_to_z_zero
 
 	end
+
+
+    # Methods for inserting comments into the CNC code
+
+	def insert_comment_to_delineate_hole_section
+		puts "( Cut the Hole )"
+	end
+
+	def insert_comment_to_delineate_slot_section
+		puts "( Cut the Slot )"		
+	end
+
+	def insert_comment_to_delineate_outer_profile_section
+		puts "( Cut the Outer Profile )"
+	end	
+
 
 	# Methods for generating modular snippets of CNC code
 
