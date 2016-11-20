@@ -40,6 +40,7 @@ class ClampMaker
 	# "up" refers to a motion in the +Z direction.
 	# "down" refers to a motion in the -Z direction.
 
+   public
 
 	def create_hole_toolpath
 
@@ -156,6 +157,7 @@ class ClampMaker
 
 	end
 
+    private
 
     # Methods for inserting comments into the CNC code
 
