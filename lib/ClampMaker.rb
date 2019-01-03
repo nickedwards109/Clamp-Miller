@@ -1,9 +1,11 @@
-class ClampMaker
+require_relative './GCodeTemplate.rb'
 
+class ClampMaker
+attr_reader :gcode_template
 
 
 	def initialize(length, width, material_thickness, xy_feedrate, z_feedrate, axial_depth_of_cut)
-		
+
 		# User-defined instance variables
 		@length = length
 		@width = width
@@ -23,6 +25,8 @@ class ClampMaker
 		@small_profile_radius = width/4
 		@half_width = width/2
 
+
+		@gcode_template = GCodeTemplate.new
 	end
 
 
@@ -41,6 +45,15 @@ class ClampMaker
 	# "down" refers to a motion in the -Z direction.
 
    public
+
+	def generate_gcode
+
+		self.create_hole_toolpath
+		self.create_slot_toolpath
+		self.create_outer_profile_toolpath
+
+		self.gcode_template.template
+	end
 
 	def create_hole_toolpath
 
@@ -66,13 +79,13 @@ class ClampMaker
 
 		rapid_feed_to_z_zero
 
-	end	
+	end
 
 
 	def create_slot_toolpath
 
 	insert_comment_to_delineate_slot_section
-	
+
 	remaining_Z_stock = @material_thickness
 
 		until cutting_complete?(remaining_Z_stock)
@@ -125,7 +138,7 @@ class ClampMaker
 		cut_clockwise_half_circle_to_make_front_profile_radius
 
 		cut_backward_to_rear_of_right_profile_edge
-		
+
 		remaining_Z_stock = @material_thickness - @axial_depth_of_cut
 
 			#create multiple successive profile passes while incrementing the axial depth of cut
@@ -162,117 +175,117 @@ class ClampMaker
     # Methods for inserting comments into the CNC code
 
 	def insert_comment_to_delineate_hole_section
-		puts "( Cut the Hole )"
+		@gcode_template.add_gcode_block("( Cut the Hole )")
 	end
 
 	def insert_comment_to_delineate_slot_section
-		puts "( Cut the Slot )"		
+		@gcode_template.add_gcode_block("( Cut the Slot )")
 	end
 
 	def insert_comment_to_delineate_outer_profile_section
-		puts "( Cut the Outer Profile )"
-	end	
+		@gcode_template.add_gcode_block("( Cut the Outer Profile )")
+	end
 
 
 	# Methods for generating modular snippets of CNC code
 
 	def rapid_feed_up_one_safe_z_height_as_an_increment
-		puts "G91"
-		puts "G0Z#{safe_z_height}"
-		puts "G90"
+		@gcode_template.add_gcode_block("G91")
+		@gcode_template.add_gcode_block("G0Z#{safe_z_height}")
+		@gcode_template.add_gcode_block("G90")
 	end
 
 	def rapid_feed_to_xy_position_of_hole_center
-		puts "G0X#{x_position_of_hole_center}Y#{y_position_of_hole_center}"
+		@gcode_template.add_gcode_block("G0X#{x_position_of_hole_center}Y#{y_position_of_hole_center}")
 	end
 
 	def rapid_feed_down_then_cut_down_into_material_as_an_increment
-		puts "G91"
-		puts "G0Z-#{safe_z_height_less_one_radius}"
-		puts "G1Z-#{axial_depth_of_cut_plus_one_radius}F#{z_feedrate}"
-		puts "G90"
+		@gcode_template.add_gcode_block("G91")
+		@gcode_template.add_gcode_block("G0Z-#{safe_z_height_less_one_radius}")
+		@gcode_template.add_gcode_block("G1Z-#{axial_depth_of_cut_plus_one_radius}F#{z_feedrate}")
+		@gcode_template.add_gcode_block("G90")
 	end
 
 	def cut_rightward_to_prepare_for_making_hole_diameter
-		puts "G1X#{x_position_at_hole_diameter}Y#{y_position_at_hole_diameter}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G1X#{x_position_at_hole_diameter}Y#{y_position_at_hole_diameter}F#{xy_feedrate}")
 	end
 
 	def cut_counter_clockwise_circle_to_make_hole_diameter
-		puts "G3X#{x_position_at_hole_diameter}Y#{y_position_at_hole_diameter}I#{i_offset_for_hole_radius}J#{j_offset_for_hole_radius}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G3X#{x_position_at_hole_diameter}Y#{y_position_at_hole_diameter}I#{i_offset_for_hole_radius}J#{j_offset_for_hole_radius}F#{xy_feedrate}")
 	end
 
 	def rapid_feed_to_z_zero
-		puts "G0Z0.0"
+		@gcode_template.add_gcode_block("G0Z0.0")
 	end
 
 	def rapid_feed_to_xy_position_of_slot_top_center
-		puts "G0X#{x_position_of_slot_center}Y#{y_position_of_slot_top_center}"
+		@gcode_template.add_gcode_block("G0X#{x_position_of_slot_center}Y#{y_position_of_slot_top_center}")
 	end
 
 	def cut_backward_to_slot_bottom_center
-		puts "G1Y#{y_position_of_slot_bottom_center}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G1Y#{y_position_of_slot_bottom_center}F#{xy_feedrate}")
 	end
 
 	def cut_rightward_to_right_edge_of_slot
-		puts "G1X#{x_position_at_right_slot_edge}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G1X#{x_position_at_right_slot_edge}F#{xy_feedrate}")
 	end
 
 	def cut_forward_to_top_right_edge_of_slot
-		puts "G1Y#{y_position_of_slot_top_center}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G1Y#{y_position_of_slot_top_center}F#{xy_feedrate}")
 	end
 
 	def cut_counter_clockwise_half_circle_to_make_slot_top_radius
-		puts "G3X#{x_position_at_left_slot_edge}I-#{i_offset_for_slot_end_radius}J#{j_offset_for_slot_end_radius}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G3X#{x_position_at_left_slot_edge}I-#{i_offset_for_slot_end_radius}J#{j_offset_for_slot_end_radius}F#{xy_feedrate}")
 	end
 
 	def cut_counter_clockwise_half_circle_to_make_slot_bottom_radius
-		puts "G3X#{x_position_at_right_slot_edge}I#{i_offset_for_slot_end_radius}J#{j_offset_for_slot_end_radius}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G3X#{x_position_at_right_slot_edge}I#{i_offset_for_slot_end_radius}J#{j_offset_for_slot_end_radius}F#{xy_feedrate}")
 	end
 
 	def rapid_feed_to_xy_position_at_rear_of_right_profile_edge
-		puts "G0X#{x_position_for_starting_outside_profile_cut}Y#{y_position_for_starting_outside_profile_cut}"
+		@gcode_template.add_gcode_block("G0X#{x_position_for_starting_outside_profile_cut}Y#{y_position_for_starting_outside_profile_cut}")
 	end
 
 	def cut_clockwise_quarter_circle_to_make_rear_right_profile_radius
-		puts "G2X#{x_position_at_bottom_of_lower_right_profile_radius}Y-#{y_position_at_bottom_of_lower_right_profile_radius}I-#{i_offset_for_lower_right_profile_radius}J#{j_offset_for_lower_right_profile_radius}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G2X#{x_position_at_bottom_of_lower_right_profile_radius}Y-#{y_position_at_bottom_of_lower_right_profile_radius}I-#{i_offset_for_lower_right_profile_radius}J#{j_offset_for_lower_right_profile_radius}F#{xy_feedrate}")
 	end
 
 	def cut_leftward_to_make_rear_profile_edge
-		puts "G1X#{x_position_at_bottom_of_lower_left_profile_radius}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G1X#{x_position_at_bottom_of_lower_left_profile_radius}F#{xy_feedrate}")
 	end
 
 	def cut_clockwise_quarter_circle_to_make_rear_left_profile_radius
-		puts "G2X-#{x_position_at_top_of_lower_left_profile_radius}Y#{y_position_at_top_of_lower_left_profile_radius}I#{i_offset_for_lower_left_profile_radius}J#{j_offset_for_lower_left_profile_radius}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G2X-#{x_position_at_top_of_lower_left_profile_radius}Y#{y_position_at_top_of_lower_left_profile_radius}I#{i_offset_for_lower_left_profile_radius}J#{j_offset_for_lower_left_profile_radius}F#{xy_feedrate}")
 	end
 
 	def cut_forward_to_make_left_profile_edge
-		puts "G1Y#{y_position_at_bottom_of_top_profile_radius}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G1Y#{y_position_at_bottom_of_top_profile_radius}F#{xy_feedrate}")
 	end
 
 	def cut_clockwise_half_circle_to_make_front_profile_radius
-		puts "G2X#{x_position_at_right_side_of_top_profile_radius}Y#{y_position_at_bottom_of_top_profile_radius}I#{i_offset_for_top_profile_radius}J0.0F#{xy_feedrate}"	
+		@gcode_template.add_gcode_block("G2X#{x_position_at_right_side_of_top_profile_radius}Y#{y_position_at_bottom_of_top_profile_radius}I#{i_offset_for_top_profile_radius}J0.0F#{xy_feedrate}")
 	end
 
 	def cut_backward_to_rear_of_right_profile_edge
-		puts "G1X#{x_position_for_starting_outside_profile_cut}Y#{y_position_for_starting_outside_profile_cut}F#{xy_feedrate}"
+		@gcode_template.add_gcode_block("G1X#{x_position_for_starting_outside_profile_cut}Y#{y_position_for_starting_outside_profile_cut}F#{xy_feedrate}")
 	end
 
 	def cut_down_into_material
-		puts "G91"
-		puts "G1Z-#{(@axial_depth_of_cut).round(3)}F#{z_feedrate}"
-		puts "G90"
+		@gcode_template.add_gcode_block("G91")
+		@gcode_template.add_gcode_block("G1Z-#{(@axial_depth_of_cut).round(3)}F#{z_feedrate}")
+		@gcode_template.add_gcode_block("G90")
 	end
 
 	def rapid_feed_to_absolute_safe_z_height
-		puts "G0Z#{@safe_z_height}"
+		@gcode_template.add_gcode_block("G0Z#{@safe_z_height}")
 	end
 
 	def rapid_feed_to_xy_origin
-		puts "G0X0.0Y0.0"
+		@gcode_template.add_gcode_block("G0X0.0Y0.0")
 	end
 
 	def cut_to_z_zero
-		puts "G1Z0.0"
+		@gcode_template.add_gcode_block("G1Z0.0")
 	end
 
 
