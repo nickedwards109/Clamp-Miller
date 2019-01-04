@@ -1,5 +1,5 @@
 require 'rack'
-require '../lib/Controller.rb'
+require './controllers/Controller.rb'
 
 server = Proc.new do |env|
   controller = Controller.new(env['QUERY_STRING'])

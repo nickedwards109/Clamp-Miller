@@ -1,5 +1,3 @@
-require 'byebug'
-
 class GCodeTemplate
   attr_reader :template
 

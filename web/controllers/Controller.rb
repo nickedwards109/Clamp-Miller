@@ -1,6 +1,5 @@
-require_relative './ClampMaker.rb'
+require_relative '../../lib/ClampMaker.rb'
 require 'cgi'
-require 'byebug'
 
 class Controller
 attr_reader :length, :width, :material_thickness, :xy_feedrate, :z_feedrate, :axial_depth_of_cut
