@@ -6,7 +6,7 @@ Here's how you can run the application and generate a CNC program:
   - Install Ruby 2.x and Rack 2.x on your local machine
   - Clone the application source code to your machine
   - In a terminal, navigate to the ./web directory
-  - Execute `server.rb`
+  - Run `$ ruby server.rb`
   - In a browser, navigate to localhost:8080
   - Fill out the form and submit it!
   - If you want to preview the toolpath, copy the G-code program and paste it into the simulator at [Q'n'dirty toolpath simulator](https://nraynaud.github.io/webgcode/)
