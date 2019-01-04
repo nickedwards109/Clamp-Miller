@@ -1,14 +1,14 @@
 require 'rack'
-form = File.read('./views/form.html')
 require '../lib/Controller.rb'
 
 server = Proc.new do |env|
+  controller = Controller.new(env['QUERY_STRING'])
   if env['PATH_INFO'] == '/'
-    ['200', {'Content-type' => 'text/html'}, [form]]
+    response = controller.render_form
+    ['200', {'Content-type' => 'text/html'}, [response]]
   elsif env['PATH_INFO'] == '/generate_gcode'
-    controller = Controller.new(env['QUERY_STRING'])
-    gcode = controller.generate_gcode
-    ['200', {'Content-type' => 'text/html'}, [gcode]]
+    response = controller.generate_gcode
+    ['200', {'Content-type' => 'text/html'}, [response]]
   end
 end
 
