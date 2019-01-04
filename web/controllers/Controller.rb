@@ -1,4 +1,4 @@
-require_relative '../../lib/ClampMaker.rb'
+require_relative '../../lib/GCodeGenerator.rb'
 require 'cgi'
 
 class Controller
@@ -21,7 +21,7 @@ attr_reader :length, :width, :material_thickness, :xy_feedrate, :z_feedrate, :ax
   end
 
   def generate_gcode
-    clamp_maker = ClampMaker.new(self.length, self.width, self.material_thickness, self.xy_feedrate, self.z_feedrate, self.axial_depth_of_cut)
-    clamp_maker.generate_gcode
+    gcode_generator = GCodeGenerator.new(self.length, self.width, self.material_thickness, self.xy_feedrate, self.z_feedrate, self.axial_depth_of_cut)
+    gcode_generator.generate_clampmaking_gcode
   end
 end

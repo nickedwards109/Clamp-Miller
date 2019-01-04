@@ -1,16 +1,16 @@
-require '../lib/ClampMaker.rb'
+require '../lib/GCodeGenerator.rb'
 require './spec_helper.rb'
 
-RSpec.describe ClampMaker do 
+RSpec.describe GCodeGenerator do
 
   # Specs for the three methods that generate all of the CNC code for making a clamp.
   # These specs are facilitated by a small material thickness and large axial depth of cut...
   # ...which results in fewer cutting passes and less code in the RSpec matcher
   context "length: 3.0, width: 1.5, material_thickness: 0.25, xy_feedrate: 15.0, z_feedrate: 10.0, axial_depth_of_cut: 0.2" do
-  let(:clampmaker) { ClampMaker.new(3.0, 1.5, 0.25, 15.0, 10.0, 0.2) }
+  let(:gcode_generator) { ToolpathProgrammer.new(3.0, 1.5, 0.25, 15.0, 10.0, 0.2) }
 
     it "generates CNC code for machining the clamp's hole" do
-      expect {clampmaker.create_hole_toolpath}.to output(/
+      expect {gcode_generator.create_hole_toolpath}.to output(/
                                                         \(.+\)\n # Comment in the CNC code. Parentheses followed by one or more of anything followed by parentheses
                                                         # First cutting pass
                                                         G91\n  # Set incremental mode
@@ -24,7 +24,7 @@ RSpec.describe ClampMaker do
                                                         G1X0.85Y2.25F15.0\n  # Feed to the X position for cutting the XY hole profile
                                                         G3X0.85Y2.25I-0.1J0.0F15.0\n  # Cut a circle offset by -0.1 along X and 0.0 along Y
                                                         # Second cutting pass
-                                                        G91\n  # Set incremental mode 
+                                                        G91\n  # Set incremental mode
                                                         G0Z0.125\n  # Rapid feed up in Z by one tool diameter
                                                         G90\n  # Set absolute mode
                                                         G0X0.75Y2.25\n   # Rapid feed to the XY position of the hole center
@@ -39,7 +39,7 @@ RSpec.describe ClampMaker do
     end
 
     it "generates CNC code for machining the clamp's slot" do
-      expect {clampmaker.create_slot_toolpath}.to output(/
+      expect {gcode_generator.create_slot_toolpath}.to output(/
                                                         \(.+\)\n # Comment in the CNC code. Parentheses followed by one or more of anything followed by parentheses
                                                         # First cutting pass
                                                         G91\n  # Set incremental mode
@@ -76,7 +76,7 @@ RSpec.describe ClampMaker do
     end
 
     it "generates CNC code for machining the clamp's outer profile" do
-      expect {clampmaker.create_outer_profile_toolpath}.to output(/
+      expect {gcode_generator.create_outer_profile_toolpath}.to output(/
                                                                  \(.+\)\n # Comment in the CNC code. Parentheses followed by one or more of anything followed by parentheses
                                                                  # First cutting pass
                                                                  G91\n  # Set incremental mode
@@ -97,7 +97,7 @@ RSpec.describe ClampMaker do
                                                                  # ...it can immediately feed one axial depth of cut into the material, without first approaching from a safe Z position.
                                                                  G91\n  # Set incremental mode
                                                                  G1Z-0.2F10.0\n  # Feed one depth of cut into the material
-                                                                 G90\n  # Set absolute mode 
+                                                                 G90\n  # Set absolute mode
                                                                  G2X1.125Y-0.063I-0.438J0.0F15.0\n  # Counter-clockwise circular interpolation feed to machine the lower right profile radius
                                                                  G1X0.375F15.0\n  # Feed to an X location of one small profile radius from the left side
                                                                  G2X-0.063Y0.375I0.0J0.438F15.0\n # Counter-clockwise circular interpolation feed to machine the lower left profile radius
@@ -109,7 +109,7 @@ RSpec.describe ClampMaker do
                                                                  G1Z0.0\n  # Rapid feed to Z origin
                                                                  /x).to_stdout
     end
-      
+
   end
 
 end

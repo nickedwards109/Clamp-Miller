@@ -1,6 +1,6 @@
 require_relative './GCodeTemplate.rb'
 
-class ClampMaker
+class GCodeGenerator
 attr_reader :gcode_template
 
 
@@ -46,7 +46,7 @@ attr_reader :gcode_template
 
    public
 
-	def generate_gcode
+	def generate_clampmaking_gcode
 
 		self.create_hole_toolpath
 		self.create_slot_toolpath
