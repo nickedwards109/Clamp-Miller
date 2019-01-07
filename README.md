@@ -3,10 +3,11 @@ This guide assumes that you have basic technical experience in setting up a CNC 
 Clamp-Miller is a CNC programming utility that creates a CNC program which can be used to machine a clamp for milling workholding applications.
 
 Here's how you can run the application and generate a CNC program:
-  - Install Ruby 2.x, Rack 2.x, and Puma 3.x on your local machine
+  - Install Ruby 2.x and Bundler 2.x on your local machine
   - Clone the application source code to your machine
-  - In a terminal, navigate to the ./web directory
-  - Run `$ puma server.ru`
+  - In a terminal, navigate to the source code's root directory
+  - Install dependencies by running `$ bundle install`
+  - Start a local server by running `$ puma ./web/server.ru`
   - In a browser, navigate to localhost:9292
   - Fill out the form and submit it!
   - If you want to preview the toolpath, copy the G-code program and paste it into the simulator at [Q'n'dirty toolpath simulator](https://nraynaud.github.io/webgcode/)
