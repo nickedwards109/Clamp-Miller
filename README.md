@@ -1,16 +1,11 @@
+# Using the application
+
+Clamp-Miller is a CNC programming utility that generates a CNC program for manufacturing custom clamps for a CNC router. It asks the user for a few mechanical parameters and then generates a CNC program consisting of G-Code. A CNC router can then run the CNC program to cut out the clamp from a piece of material stock.
+
+You can go ahead and use the application at http://ec2-13-58-192-235.us-east-2.compute.amazonaws.com:1111/
+
+# Setting up your CNC router
 This guide assumes that you have basic technical experience in setting up a CNC router and running a CNC program. If that doesn't describe you, please consider finding a makerspace that has a CNC router and a community where you can learn!
-
-Clamp-Miller is a CNC programming utility that creates a CNC program which can be used to machine a clamp for milling workholding applications.
-
-Here's how you can run the application and generate a CNC program:
-  - Install Ruby 2.x and Bundler 2.x on your local machine
-  - Clone the application source code to your machine
-  - In a terminal, navigate to the source code's root directory
-  - Install dependencies by running `$ bundle install`
-  - Start a local server by running `$ puma ./web/server.ru`
-  - In a browser, navigate to localhost:9292
-  - Fill out the form and submit it!
-  - If you want to preview the toolpath, copy the G-code program and paste it into the simulator at [Q'n'dirty toolpath simulator](https://nraynaud.github.io/webgcode/)
 
 Once you have generated a CNC program, consider whether your CNC machine manages spindle control manually or through G-code. The generated CNC program only controls feed motions and feedrate speeds. If the spindle on your CNC machine is managed by G-code, you will need add code at the beginning of the program to turn on the spindle with something like `S1000M03` and turn it off at the end of the program with `M05`.
 
@@ -27,4 +22,14 @@ Here is an image of a setup for machining a clamp. The outer profile of the clam
 
 Once you have generated a CNC program and set up your CNC router, you can upload the CNC program to your CNC controller and run it. In my case, I uploaded it over a serial connection to an Arduino running [GRBL](https://github.com/grbl/grbl)
 
+# Contributing
+
 Contributors are welcome! To contribute to this code base, please create a pull request to https://github.com/nickedwards109/Clamp-Miller
+
+First, you'll need to be able to run the application locally. To do this:
+  - Install Ruby 2.x and Bundler 2.x on your local machine
+  - Clone the application source code to your machine
+  - In a terminal, navigate to the source code's root directory
+  - Install dependencies by running `$ bundle install`
+  - Navigate to the /web directory and start a local server by running `$ puma server.ru`
+  - In a browser, navigate to localhost:9292
