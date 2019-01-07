@@ -12,4 +12,4 @@ server = Proc.new do |env|
   end
 end
 
-Rack::Handler::WEBrick.run server
+run server
