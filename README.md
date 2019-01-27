@@ -2,7 +2,7 @@
 
 Clamp-Miller is a CNC programming utility that generates a CNC program for manufacturing custom clamps for a CNC router. It asks the user for a few mechanical parameters and then generates a CNC program consisting of G-Code. A CNC router can then run the CNC program to cut out the clamp from a piece of material stock.
 
-You can go ahead and use the application at http://ec2-13-58-192-235.us-east-2.compute.amazonaws.com:1111/
+The application is live at http://d3l0ptyba3rq5y.cloudfront.net/ 
 
 # Setting up your CNC router
 This guide assumes that you have basic technical experience in setting up a CNC router and running a CNC program. If that doesn't describe you, please consider finding a makerspace that has a CNC router and a community where you can learn!
