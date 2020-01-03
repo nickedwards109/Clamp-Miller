@@ -2,7 +2,14 @@
 
 Clamp-Miller is a CNC programming utility that generates a CNC program for manufacturing custom clamps for a CNC router. It asks the user for a few mechanical parameters and then generates a CNC program consisting of G-Code. A CNC router can then run the CNC program to cut out the clamp from a piece of material stock.
 
-The application is live at http://d3l0ptyba3rq5y.cloudfront.net/ 
+To run the application locally:
+  - Install Ruby 2.x and Bundler 2.x on your local machine
+  - Clone the application source code to your machine
+  - In a terminal, navigate to the source code's root directory
+  - Install dependencies by running `$ bundle install`
+  - Navigate to the /web directory and start a local server by running `$ puma server.ru`
+  - In a browser, navigate to localhost:9292
+  - Fill out and submit the form. You'll see a G-Code program that you can copy and upload into a CNC controller. If your CNC controller runs GRBL, there are several options for uploading your CNC program described at https://github.com/grbl/grbl/wiki/Using-Grbl
 
 # Setting up your CNC router
 This guide assumes that you have basic technical experience in setting up a CNC router and running a CNC program. If that doesn't describe you, please consider finding a makerspace that has a CNC router and a community where you can learn!
@@ -25,11 +32,3 @@ Once you have generated a CNC program and set up your CNC router, you can upload
 # Contributing
 
 Contributors are welcome! To contribute to this code base, please create a pull request to https://github.com/nickedwards109/Clamp-Miller
-
-First, you'll need to be able to run the application locally. To do this:
-  - Install Ruby 2.x and Bundler 2.x on your local machine
-  - Clone the application source code to your machine
-  - In a terminal, navigate to the source code's root directory
-  - Install dependencies by running `$ bundle install`
-  - Navigate to the /web directory and start a local server by running `$ puma server.ru`
-  - In a browser, navigate to localhost:9292
