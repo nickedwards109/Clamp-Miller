@@ -5,9 +5,9 @@ Clamp-Miller is a CNC programming utility that generates a CNC program for manuf
 To run the application locally:
   - Install Ruby 2.x and Bundler 2.x on your local machine
   - Clone the application source code to your machine
-  - In a terminal, navigate to the source code's root directory
+  - In a terminal, navigate to the source code's root directory, ./Clamp-Miller/
   - Install dependencies by running `$ bundle install`
-  - Navigate to the /web directory and start a local server by running `$ puma server.ru`
+  - Navigate to the ./web/ directory and start a local server by running `$ puma server.ru`
   - In a browser, navigate to localhost:9292
   - Fill out and submit the form. You'll see a G-Code program that you can copy and upload into a CNC controller. If your CNC controller runs GRBL, there are several options for uploading your CNC program described at https://github.com/grbl/grbl/wiki/Using-Grbl
 
